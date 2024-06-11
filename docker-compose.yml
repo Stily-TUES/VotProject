@@ -1,0 +1,37 @@
+version: '2.0'
+
+services:
+  mariadb1:
+    image: mariadb:10.1
+    container_name: mariadb1
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+    volumes:
+      - mariadb1:/var/lib/mysql
+
+  mariadb2:
+    container_name: mariadb2
+    image: mariadb:10.1
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3307:3306"
+    depends_on:
+      - mariadb1
+    volumes:
+      - mariadb2:/var/lib/mysql
+
+  maxscale:
+    image: mariadb/maxscale:latest
+    ports:
+      - "8989:8989"
+      - "4006:4006"
+    depends_on:
+      - mariadb1
+      - mariadb2
+
+volumes:
+  mariadb1:
+  mariadb2:
