@@ -1,5 +1,6 @@
 version: '2.0'
 
+
 services:
   mariadb1:
     image: mariadb:10.1
@@ -31,6 +32,15 @@ services:
     depends_on:
       - mariadb1
       - mariadb2
+      
+  keycloak:
+    image: quay.io/keycloak/keycloak:25.0.0
+    ports:
+      - "8080:8080"
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+    command: start-dev
 
 volumes:
   mariadb1:
