@@ -4,7 +4,7 @@ services:
     image: mariadb:10.5
     container_name: mariadb1
     ports:
-      - "3306:3306"
+      - "3307:3306"
     env_file: .env
     environment:
       - MARIADB_USER=${MARIADB_USER_1}
@@ -23,7 +23,7 @@ services:
     image: mariadb:10.5
     container_name: mariadb2
     ports:
-      - "3307:3306"
+      - "3308:3306"
     env_file: .env
     environment:
       - MARIADB_USER=${MARIADB_USER_2}
@@ -38,22 +38,16 @@ services:
       - mariadb
 
   #proxysql
-  proxysql: 
-    image: proxysql/proxysql:latest
-    container_name: proxysql
+  db-loadbalancer:
+    image: mariadb/maxscale:24.02.1
     ports:
-      - "6032:6032"
-      - "6070:6070"
-      - "6080:6080"
-    volumes:
-      - ./proxysql.cnf:/etc/proxysql.cnf
-    cap_add:
-      - all
-    networks:
-      - mariadb
+      - "3306:3306"
+      - "8989:8989"
     depends_on:
       - mariadb1
       - mariadb2
+    networks:
+      - mariadb
 
   keycloak:
     image: quay.io/keycloak/keycloak:25.0.0
