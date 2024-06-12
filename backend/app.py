@@ -9,13 +9,17 @@ from sqlalchemy.orm import sessionmaker
 
 load_dotenv()
 
-realm_id = os.getenv("KEYCLOAK_REALM")
-client_id = os.getenv("KEYCLOAK_CLIENT_ID")
-client_secret = os.getenv("KEYCLOAK_SECRET")
-database_url = os.getenv("DATABASE_URL")
+db_host = "localhost" # "db-loadbalancer"
 
+keycloak_host = "localhost" # "keycloak"
+realm_id = "myrealm"
+client_id = "backend"
+client_secret = "b12qIpCZFn0DECBUa12vBe3Ajl39jAEp"
+database_url = "mysql://admin:admin@localhost:3306/test"
 app = Flask(__name__)
 CORS(app)
+
+database_url = database_url.replace('mysql://', 'mysql+pymysql://')
 
 engine = create_engine(database_url)
 Session = sessionmaker(bind=engine)
@@ -48,17 +52,24 @@ def increment_counter():
 
     if response.get("active"):
         session = Session()
-        counter = session.query(ClickCounter).first()
-        if counter is None:
-            counter = ClickCounter(count=1)
-            session.add(counter)
-        else:
-            counter.count += 1
-        session.commit()
-        session.close()
-        return jsonify({"count": counter.count})
+        try:
+            counter = session.query(ClickCounter).first()
+            if counter is None:
+                counter = ClickCounter(count=1)
+                session.add(counter)
+            else:
+                counter.count += 1
+            session.commit()
+            count_value = counter.count
+        except Exception as e:
+            session.rollback()
+            return make_response({"error": str(e)}, 500)
+        finally:
+            session.close()
+        return jsonify({"count": count_value})
     else:
         return make_response({"error": "Invalid token"}, 401)
+
 
 if __name__ == "__main__":
     app.run(port=5001, host="0.0.0.0", debug=True)

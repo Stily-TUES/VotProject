@@ -5,12 +5,13 @@ import './App.css';
 /*
   Init Options
 */
-const initOptions = {
-  url: process.env.REACT_APP_KEYCLOAK_URL,
-  realm: process.env.REACT_APP_KEYCLOAK_REALM,
-  clientId: process.env.REACT_APP_KEYCLOAK_CLIENT_ID,
+let initOptions = {
+  url: 'http://localhost:8080/',
+  realm: 'myrealm',
+  clientId: 'frontend',
 }
 
+console.log('initOptions', initOptions)
 let kc = new Keycloak(initOptions);
 
 kc.init({
