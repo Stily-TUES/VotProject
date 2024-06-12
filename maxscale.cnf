@@ -1,0 +1,41 @@
+# Global settings
+[maxscale]
+threads=auto
+
+# Server definitions
+[server1]
+type=server
+address=mariadb1
+port=3306
+protocol=MariaDBBackend
+
+[server2]
+type=server
+address=mariadb2
+port=3306
+protocol=MariaDBBackend
+
+# Monitor for the servers
+[Monitor]
+type=monitor
+module=mariadbmon
+servers=server1,server2
+user=admin
+password=admin
+
+# Service definition
+[Read-Write Service]
+type=service
+router=readwritesplit
+servers=server1,server2
+user=admin
+password=admin
+router_options=slave_selection_criteria=LEAST_CURRENT_OPERATIONS
+
+# Listener definition
+[Read-Write Listener]
+type=listener
+service=Read-Write Service
+protocol=MariaDBClient
+port=3306
+address=0.0.0.0

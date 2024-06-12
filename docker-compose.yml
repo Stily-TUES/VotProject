@@ -1,5 +1,7 @@
+version: '3.8'
+
 services:
-  #mariadb-1
+  # mariadb-1
   mariadb1:
     image: mariadb:10.5
     container_name: mariadb1
@@ -18,7 +20,7 @@ services:
     networks:
       - mariadb
 
-  #mariadb-2
+  # mariadb-2
   mariadb2:
     image: mariadb:10.5
     container_name: mariadb2
@@ -38,9 +40,10 @@ services:
       - mariadb
     depends_on:
       - mariadb1
-  
+
   db-loadbalancer:
     image: mariadb/maxscale:24.02.1
+    container_name: db-loadbalancer
     ports:
       - "3306:3306"
       - "8989:8989"
@@ -49,6 +52,8 @@ services:
       - mariadb2
     networks:
       - mariadb
+    volumes:
+      - ./maxscale.cnf:/etc/maxscale.cnf
 
   keycloak:
     image: quay.io/keycloak/keycloak:25.0.0
