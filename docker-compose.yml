@@ -36,8 +36,9 @@ services:
       - all
     networks:
       - mariadb
-
-  #proxysql
+    depends_on:
+      - mariadb1
+  
   db-loadbalancer:
     image: mariadb/maxscale:24.02.1
     ports:
